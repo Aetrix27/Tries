@@ -49,41 +49,22 @@ class PrefixTree:
         first_char, first_node = string[0], None
         if isinstance(self.root.children[first_char], PrefixTreeNode):
             first_node = self.root.children[first_char]
-            self._traverse(first_node, string, visit=1)
+            self._find_node(first_node, string, visit=1)
         else:
             return False
             
-        # start traversing down the trie
-        first_char, first_node = string[0], None
-        if isinstance(self.root.children[first_char], PrefixTreeNode):
-            first_node = self.root.children[first_char]
-            self._traverse(first_node, string, visit=1)
-        else:
-            return False
-
+  
     def insert(self, string):
         """Insert the given string into this prefix tree."""
         # TODO
-        def _recursive_helper(node, index):
-            # A: Base case: reached the end
-            if index == len(string):
-                node.is_terminal = True
-            # B: Recusrive: not the end
-            else:
-                next_char = string[index]
-                next_node = node.children[next_char]
-                if isinstance(next_node, PrefixTreeNode) is False:
-                    next_node = PrefixTreeNode(next_char)
-                    node.children[next_char] = next_node
-                _recursive_helper(next_node, index + 1)
 
         # start traversing down the trie
         first_char = string[0]
-        first_node = self.root.children[first_char]
-        if isinstance(first_node, PrefixTreeNode) is False:
+        #first_node = self.root.children[first_char]
+        if isinstance(self.root, PrefixTreeNode) is False:
             first_node = PrefixTreeNode(first_char)
             self.root.children[first_char] = first_node
-        _recursive_helper(first_node, index=1)
+        self._traverse(self.root, string, visit=1)
 
 
     def _find_node(self, string):
@@ -98,6 +79,7 @@ class PrefixTree:
         node = self.root
         # TODO
         depth = 0
+        prefix = node
         for character in string:
             for child in node.children.values():
                 if child.character == character:
@@ -134,27 +116,24 @@ class PrefixTree:
     def strings(self):
         """Return a list of all strings stored in this prefix tree."""
         # Create a list of all strings in prefix tree
-        return self._traverse(self.root, self.root.character,0)
+        strings = []
+        # use the recursive traverse function, start from the self.root, start from an empty prefix, and on each node visited, append to the empty array
+        def visit(value):
+            visit.append(value)
+        self._traverse(self.root, '', strings.append)
+        return strings
+
 
     def _traverse(self, node, prefix, visit):
         """Traverse this prefix tree with recursive depth-first traversal.
         Start at the given node with the given prefix representing its path in
         this prefix tree and visit each node with the given visit function."""
         # TODO
-        #self._find_node()
-        # A: Base case: reached the end
-        if visit == len(prefix):
-            return node.is_terminal
-        # B: Recusrive: not the end
-        else:
-            next_char = prefix[visit]
-            next_node = node.children[next_char]
-            if isinstance(
-                node.children[next_char], PrefixTreeNode
-            ):
-                self._traverse(next_node, prefix, visit + 1)
-            else:
-                return False
+        if node.is_terminal():
+            visit(prefix)
+        for char in node.children.keys():
+            child = node.get_child(char)
+            self._traverse(child, prefix + char, visit)
 
 
 def create_prefix_tree(strings):
