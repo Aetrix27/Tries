@@ -81,7 +81,7 @@ class PrefixTree:
         depth = 0
         prefix = node
         for character in string:
-            for child in node.children.values():
+            for child in node.children.keys():
                 if child.character == character:
                     depth += 1
                     prefix = child
