@@ -44,26 +44,30 @@ class PrefixTree:
 
     def contains(self, string):
         """Return True if this prefix tree contains the given string."""
-        # TODO 
-        # start traversing down the trie
-        first_char, first_node = string[0], None
-        if isinstance(self.root.children[first_char], PrefixTreeNode):
-            first_node = self.root.children[first_char]
-            self._find_node(first_node, string, visit=1)
-        else:
-            return False
+
+        node = self.root
+        for char in string: 
+            if node.has_child(char): 
+                child = node.get_child(char)
+                node = child 
+            else: 
+                return node.is_terminal()
+        return node.is_terminal() 
             
   
     def insert(self, string):
         """Insert the given string into this prefix tree."""
-        # TODO
-
         # start traversing down the trie
         first_char = string[0]
         #first_node = self.root.children[first_char]
-        if isinstance(self.root, PrefixTreeNode) is False:
+        if node.has_child():
             first_node = PrefixTreeNode(first_char)
             self.root.children[first_char] = first_node
+        else:
+            new_node = PrefixTreeNode()
+            node.add_child(char, new_node) # Append new node
+            node = new_node # point "head" to new new node and continue
+
         self._traverse(self.root, string, visit=1)
 
 
@@ -77,18 +81,20 @@ class PrefixTree:
             return self.root, 0
         # Start with the root node
         node = self.root
-        # TODO
         depth = 0
-        prefix = node
         for character in string:
-            for child in node.children.keys():
-                if child.character == character:
-                    depth += 1
-                    prefix = child
-                else: 
-                    return False
-     
-        return [depth, prefix]
+            for char in node.children.keys():
+                if node.has_child(char):
+                    child = node.get_child(char)
+                    if child.character == character:
+                        depth += 1
+                    else: 
+                        break
+             
+        if depth != 0:
+            return [depth, node]
+        else:
+            return [0, node]
             
 
     def complete(self, prefix):
@@ -96,30 +102,20 @@ class PrefixTree:
         with the given prefix string."""
         # Create a list of completions in prefix tree
         completions = []
-        if len(prefix) == 0:
-            return self.root, 0
-        # Start with the root node
-        node = self.root
-        # TODO
-        depth = 0
-        prefix = []
-        for character in prefix:
-            for child in node.children.values():
-                if child.character == character:
-                    completions.append(child.character)
-                else: 
-                    return False
-     
+        if prefix == '':
+            return self.strings()
+        node = self._find_node(prefix)
+        if node[1] != '':
+            self._traverse(node[1], prefix, completions.append)
         return completions
-        # TODO
+
 
     def strings(self):
         """Return a list of all strings stored in this prefix tree."""
         # Create a list of all strings in prefix tree
         strings = []
         # use the recursive traverse function, start from the self.root, start from an empty prefix, and on each node visited, append to the empty array
-        def visit(value):
-            visit.append(value)
+      
         self._traverse(self.root, '', strings.append)
         return strings
 
@@ -128,7 +124,6 @@ class PrefixTree:
         """Traverse this prefix tree with recursive depth-first traversal.
         Start at the given node with the given prefix representing its path in
         this prefix tree and visit each node with the given visit function."""
-        # TODO
         if node.is_terminal():
             visit(prefix)
         for char in node.children.keys():
