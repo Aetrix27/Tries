@@ -36,7 +36,6 @@ class PrefixTree:
 
     def is_empty(self):
         """Return True if this prefix tree is empty (contains no strings)."""
-        # TODO
         if self.size == 0:
             return True
         else: 
@@ -58,18 +57,18 @@ class PrefixTree:
     def insert(self, string):
         """Insert the given string into this prefix tree."""
         # start traversing down the trie
-        first_char = string[0]
-        #first_node = self.root.children[first_char]
-        if node.has_child():
-            first_node = PrefixTreeNode(first_char)
-            self.root.children[first_char] = first_node
-        else:
-            new_node = PrefixTreeNode()
-            node.add_child(char, new_node) # Append new node
-            node = new_node # point "head" to new new node and continue
-
-        self._traverse(self.root, string, visit=1)
-
+        node = self.root
+        for character in string:
+            #first_node = self.root.children[first_char]
+            if node.has_child(character):
+                node = node.get_child(character)
+            else:
+                new_node = PrefixTreeNode(character)
+                node.add_child(character, new_node) 
+                node = new_node
+        if not node.is_terminal():
+            self.size += 1
+            node.terminal = True
 
     def _find_node(self, string):
         """Return a pair containing the deepest node in this prefix tree that
@@ -78,34 +77,29 @@ class PrefixTree:
         Search is done iteratively with a loop starting from the root node."""
         # Match the empty string
         if len(string) == 0:
-            return self.root, 0
+            return 0, self.root
         # Start with the root node
         node = self.root
         depth = 0
         for character in string:
-            for char in node.children.keys():
-                if node.has_child(char):
-                    child = node.get_child(char)
-                    if child.character == character:
-                        depth += 1
-                    else: 
-                        break
+            if node.has_child(character) is True:
+                node = node.get_child(character)
+                depth += 1
+            else: 
+                break
              
-        if depth != 0:
-            return [depth, node]
-        else:
-            return [0, node]
+        return depth, node
             
 
     def complete(self, prefix):
         """Return a list of all strings stored in this prefix tree that start
         with the given prefix string."""
-        # Create a list of completions in prefix tree
+
         completions = []
         if prefix == '':
             return self.strings()
         node = self._find_node(prefix)
-        if node[1] != '':
+        if node[1].character != '':
             self._traverse(node[1], prefix, completions.append)
         return completions
 
