@@ -100,17 +100,15 @@ class PrefixTree:
             return self.strings()
         node = self._find_node(prefix)
         if node[1].character != '':
-            self._traverse(node[1], prefix, completions.append)
+            self._traverse(node[1], prefix, completions)
         return completions
 
 
     def strings(self):
         """Return a list of all strings stored in this prefix tree."""
-        # Create a list of all strings in prefix tree
         strings = []
-        # use the recursive traverse function, start from the self.root, start from an empty prefix, and on each node visited, append to the empty array
       
-        self._traverse(self.root, '', strings.append)
+        self._traverse(self.root, '', strings)
         return strings
 
 
@@ -119,7 +117,7 @@ class PrefixTree:
         Start at the given node with the given prefix representing its path in
         this prefix tree and visit each node with the given visit function."""
         if node.is_terminal():
-            visit(prefix)
+            visit.append(prefix)
         for char in node.children.keys():
             child = node.get_child(char)
             self._traverse(child, prefix + char, visit)
@@ -148,6 +146,7 @@ def create_prefix_tree(strings):
 
     print('\nSearching for strings not in tree:')
     prefixes = sorted(set(string[:len(string)//2] for string in strings))
+    print(prefixes,"PRE")
     for prefix in prefixes:
         if len(prefix) == 0 or prefix in strings:
             continue
